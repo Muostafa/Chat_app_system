@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: chat_system_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: chat_system_development
+      MYSQL_USER: chat_user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: chat_system_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: chat_system_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: chat_system_web
+    command: bundle exec rails db:create && bundle exec rails db:migrate && bundle exec puma -b tcp://0.0.0.0:3000
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: development
+      DATABASE_USER: root
+      DATABASE_PASSWORD: password
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      REDIS_URL: redis://redis:6379/0
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-insecure}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - .:/rails
+      - /rails/tmp
+      - /rails/log
+
+  sidekiq:
+    build: .
+    container_name: chat_system_sidekiq
+    command: bundle exec sidekiq -c 5 -v
+    environment:
+      RAILS_ENV: development
+      DATABASE_USER: root
+      DATABASE_PASSWORD: password
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      REDIS_URL: redis://redis:6379/0
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-insecure}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - .:/rails
+      - /rails/tmp
+      - /rails/log
+
+volumes:
+  mysql_data:
+  redis_data:
+  elasticsearch_data:
