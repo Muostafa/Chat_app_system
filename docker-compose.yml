@@ -52,7 +52,7 @@ services:
   web:
     build: .
     container_name: chat_system_web
-    command: bundle exec rails db:create && bundle exec rails db:migrate && bundle exec puma -b tcp://0.0.0.0:3000
+    command: sh -c "bundle exec rails db:create && bundle exec rails db:migrate && bundle exec puma -b tcp://0.0.0.0:3000"
     ports:
       - "3000:3000"
     environment:
