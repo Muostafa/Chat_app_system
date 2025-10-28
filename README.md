@@ -2,6 +2,9 @@
 
 A scalable, production-ready chat system API built with Ruby on Rails that handles concurrent requests, asynchronous message processing, and full-text search capabilities.
 
+> ⚠️ Note: The `.env` file is intentionally included for interview purposes.  
+> It contains only non-sensitive development credentials.
+
 ## Stack
 
 - **Framework:** Ruby on Rails 8.1 (API only)
@@ -45,6 +48,7 @@ docker-compose up
 ```
 
 The docker-compose will automatically:
+
 1. Start MySQL, Redis, and Elasticsearch containers
 2. Build the Rails application
 3. Run database migrations
@@ -54,6 +58,7 @@ The docker-compose will automatically:
 ## API Documentation
 
 ### Base URL
+
 ```
 http://localhost:3000/api/v1
 ```
@@ -61,11 +66,13 @@ http://localhost:3000/api/v1
 ### Create Chat Application
 
 **Endpoint:**
+
 ```
 POST /chat_applications
 ```
 
 **Request:**
+
 ```json
 {
   "chat_application": {
@@ -75,6 +82,7 @@ POST /chat_applications
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": 1,
@@ -87,11 +95,13 @@ POST /chat_applications
 ### Get Chat Application
 
 **Endpoint:**
+
 ```
 GET /chat_applications/:token
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": 1,
@@ -104,11 +114,13 @@ GET /chat_applications/:token
 ### Create Chat
 
 **Endpoint:**
+
 ```
 POST /chat_applications/:token/chats
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "number": 1,
@@ -121,11 +133,13 @@ Note: Chat number is auto-generated sequentially starting from 1.
 ### Get All Chats for Application
 
 **Endpoint:**
+
 ```
 GET /chat_applications/:token/chats
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -142,11 +156,13 @@ GET /chat_applications/:token/chats
 ### Get Specific Chat
 
 **Endpoint:**
+
 ```
 GET /chat_applications/:token/chats/:number
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "number": 1,
@@ -157,11 +173,13 @@ GET /chat_applications/:token/chats/:number
 ### Create Message
 
 **Endpoint:**
+
 ```
 POST /chat_applications/:token/chats/:number/messages
 ```
 
 **Request:**
+
 ```json
 {
   "message": {
@@ -171,6 +189,7 @@ POST /chat_applications/:token/chats/:number/messages
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "number": 1
@@ -182,11 +201,13 @@ Note: Message number is auto-generated sequentially starting from 1 for each cha
 ### Get All Messages in Chat
 
 **Endpoint:**
+
 ```
 GET /chat_applications/:token/chats/:number/messages
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -203,11 +224,13 @@ GET /chat_applications/:token/chats/:number/messages
 ### Get Specific Message
 
 **Endpoint:**
+
 ```
 GET /chat_applications/:token/chats/:number/messages/:number
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "number": 1,
@@ -218,14 +241,17 @@ GET /chat_applications/:token/chats/:number/messages/:number
 ### Search Messages in Chat
 
 **Endpoint:**
+
 ```
 GET /chat_applications/:token/chats/:number/messages/search?q=hello
 ```
 
 **Query Parameters:**
+
 - `q` (required): Search query for partial matching against message body
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -260,6 +286,7 @@ bundle exec rspec --format coverage
 ### Database Schema
 
 **chat_applications:**
+
 - `id`: Primary key
 - `name`: Application name
 - `token`: Unique identifier (generated automatically)
@@ -267,6 +294,7 @@ bundle exec rspec --format coverage
 - `created_at`, `updated_at`: Timestamps
 
 **chats:**
+
 - `id`: Primary key
 - `chat_application_id`: Foreign key to chat_applications
 - `number`: Sequential number within application (starts from 1)
@@ -274,6 +302,7 @@ bundle exec rspec --format coverage
 - `created_at`, `updated_at`: Timestamps
 
 **messages:**
+
 - `id`: Primary key
 - `chat_id`: Foreign key to chats
 - `number`: Sequential number within chat (starts from 1)
@@ -283,21 +312,25 @@ bundle exec rspec --format coverage
 ### Key Design Decisions
 
 1. **Sequential Numbering:**
+
    - Implemented using Redis atomic INCR operations
    - Race-condition safe for concurrent requests
    - Database unique indices provide final safeguard
 
 2. **Async Processing:**
+
    - Message creation returns immediately (optimized for latency)
    - Sidekiq jobs handle Elasticsearch indexing
    - Count updates queued asynchronously
 
 3. **Search:**
+
    - Elasticsearch provides full-text search
    - Messages indexed automatically on creation
    - Supports partial matching on message body
 
 4. **Indices:**
+
    - Unique index on (chat_application_id, chat.number)
    - Unique index on (chat_id, message.number)
    - Full-text index on message body for search
@@ -325,24 +358,28 @@ RAILS_MASTER_KEY=insecure (for development only)
 ## Troubleshooting
 
 ### Elasticsearch not ready
+
 ```
 Wait for Elasticsearch to fully start (30-60 seconds)
 Check: curl http://localhost:9200/_cluster/health
 ```
 
 ### Database migration errors
+
 ```
 docker-compose exec web rails db:reset
 docker-compose exec web rails db:migrate
 ```
 
 ### Redis connection issues
+
 ```
 docker-compose exec redis redis-cli ping
 # Should return: PONG
 ```
 
 ### Sidekiq worker not processing jobs
+
 ```
 docker-compose logs sidekiq
 docker-compose restart sidekiq
@@ -351,16 +388,19 @@ docker-compose restart sidekiq
 ## Performance Considerations
 
 1. **Concurrent Request Handling:**
+
    - Redis atomic operations prevent race conditions
    - Connection pooling configured per Rails guidelines
    - Sidekiq workers scale independently
 
 2. **Database Optimization:**
+
    - All queries use indexed columns
-   - Count caches reduce COUNT(*) queries
+   - Count caches reduce COUNT(\*) queries
    - Foreign key constraints ensure data integrity
 
 3. **Search Performance:**
+
    - Elasticsearch handles full-text search efficiently
    - Index size managed automatically
    - Search results cached in client layer
