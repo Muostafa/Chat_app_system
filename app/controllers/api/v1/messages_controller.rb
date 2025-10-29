@@ -5,19 +5,19 @@ class Api::V1::MessagesController < ApplicationController
 
   # POST /api/v1/chat_applications/:token/chats/:number/messages
   def create
+    # Validate message body
+    return render json: { errors: { body: ["can't be blank"] } }, status: :unprocessable_entity if message_params[:body].blank?
+
+    # Get the next sequential number atomically from Redis
     message_number = SequentialNumberService.next_message_number(@chat.id)
-    @message = @chat.messages.build(message_params.merge(number: message_number))
 
-    if @message.save
-      # Queue job to persist and update counts
-      PersistMessageJob.perform_later(@message.id)
+    # Queue job to persist message asynchronously (avoid direct MySQL write during request)
+    CreateMessageJob.perform_later(@chat.id, message_number, message_params[:body])
 
-      render json: {
-        number: @message.number
-      }, status: :created
-    else
-      render json: { errors: @message.errors }, status: :unprocessable_entity
-    end
+    # Return immediately without waiting for database write
+    render json: {
+      number: message_number
+    }, status: :created
   end
 
   # GET /api/v1/chat_applications/:token/chats/:number/messages

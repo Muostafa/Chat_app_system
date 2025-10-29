@@ -4,20 +4,17 @@ class Api::V1::ChatsController < ApplicationController
 
   # POST /api/v1/chat_applications/:token/chats
   def create
+    # Get the next sequential number atomically from Redis
     chat_number = SequentialNumberService.next_chat_number(@chat_application.id)
-    @chat = @chat_application.chats.build(number: chat_number)
 
-    if @chat.save
-      # Queue job to update chats_count
-      UpdateChatApplicationCountJob.perform_later(@chat_application.id)
+    # Queue job to persist chat asynchronously (avoid direct MySQL write during request)
+    CreateChatJob.perform_later(@chat_application.id, chat_number)
 
-      render json: {
-        number: @chat.number,
-        messages_count: @chat.messages_count
-      }, status: :created
-    else
-      render json: { errors: @chat.errors }, status: :unprocessable_entity
-    end
+    # Return immediately without waiting for database write
+    render json: {
+      number: chat_number,
+      messages_count: 0
+    }, status: :created
   end
 
   # GET /api/v1/chat_applications/:token/chats
