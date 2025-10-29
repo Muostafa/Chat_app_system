@@ -97,11 +97,14 @@ RSpec.describe RebuildRedisCountersJob, type: :job do
       let!(:chat) { create(:chat, chat_application: app, number: 1) }
 
       it 'logs completion message' do
-        expect(Rails.logger).to receive(:info).with(/RebuildRedisCountersJob completed successfully/)
-        expect(Rails.logger).to receive(:info).with(/Rebuilt chat counter for app #{app.id}/)
-        expect(Rails.logger).to receive(:info).with(/Rebuilt message counter for chat #{chat.id}/)
+        # Allow any order for the info calls
+        allow(Rails.logger).to receive(:info)
 
         described_class.perform_now
+
+        expect(Rails.logger).to have_received(:info).with(/RebuildRedisCountersJob completed successfully/)
+        expect(Rails.logger).to have_received(:info).with(/Rebuilt chat counter for app #{app.id}/)
+        expect(Rails.logger).to have_received(:info).with(/Rebuilt message counter for chat #{chat.id}/)
       end
     end
   end
