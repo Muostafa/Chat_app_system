@@ -5,6 +5,11 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # Redis counter consistency health check
+  namespace :health do
+    get 'redis_counters', to: 'health#redis_counters'
+  end
+
   namespace :api do
     namespace :v1 do
       resources :chat_applications, param: :token do
