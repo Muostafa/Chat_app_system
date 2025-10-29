@@ -13,6 +13,7 @@ http://localhost:3000/api/v1
 ### Create Chat Application
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications \
   -H "Content-Type: application/json" \
@@ -24,9 +25,9 @@ curl -X POST http://localhost:3000/api/v1/chat_applications \
 ```
 
 **Response (201 Created):**
+
 ```json
 {
-  "id": 1,
   "name": "Mobile App Chat",
   "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
   "chats_count": 0
@@ -38,14 +39,15 @@ curl -X POST http://localhost:3000/api/v1/chat_applications \
 ### Get Chat Application
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
 ```
 
 **Response (200 OK):**
+
 ```json
 {
-  "id": 1,
   "name": "Mobile App Chat",
   "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
   "chats_count": 2
@@ -55,21 +57,21 @@ curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4
 ### List All Chat Applications
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
-    "id": 1,
     "name": "Mobile App Chat",
     "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
     "chats_count": 2
   },
   {
-    "id": 2,
     "name": "Web App Chat",
     "token": "z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4",
     "chats_count": 0
@@ -80,6 +82,7 @@ curl http://localhost:3000/api/v1/chat_applications
 ### Update Chat Application Name
 
 **Request:**
+
 ```bash
 curl -X PATCH http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6 \
   -H "Content-Type: application/json" \
@@ -91,9 +94,9 @@ curl -X PATCH http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j
 ```
 
 **Response (200 OK):**
+
 ```json
 {
-  "id": 1,
   "name": "Updated Mobile App Chat",
   "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
   "chats_count": 2
@@ -109,12 +112,14 @@ Assuming token: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`
 ### Create Chat
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats \
   -H "Content-Type: application/json"
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "number": 1,
@@ -123,12 +128,14 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Create Second Chat:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats \
   -H "Content-Type: application/json"
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "number": 2,
@@ -139,11 +146,13 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ### Get All Chats for Application
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -160,11 +169,13 @@ curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4
 ### Get Specific Chat
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "number": 1,
@@ -181,6 +192,7 @@ Assuming token: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6` and chat number: `1`
 ### Create Message
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
   -H "Content-Type: application/json" \
@@ -192,6 +204,7 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "number": 1
@@ -199,6 +212,7 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Create Second Message:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
   -H "Content-Type: application/json" \
@@ -210,6 +224,7 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "number": 2
@@ -219,11 +234,13 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ### Get All Messages in Chat
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -240,11 +257,13 @@ curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4
 ### Get Specific Message
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages/1
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "number": 1,
@@ -255,11 +274,13 @@ curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4
 ### Search Messages in Chat
 
 **Simple Search:**
+
 ```bash
 curl "http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages/search?q=hello"
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -270,11 +291,13 @@ curl "http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n
 ```
 
 **Search with Multiple Words:**
+
 ```bash
 curl "http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages/search?q=doing%20great"
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -291,11 +314,13 @@ curl "http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n
 ### Chat Application Not Found
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/invalid_token
 ```
 
 **Response (404 Not Found):**
+
 ```json
 {
   "error": "ChatApplication not found"
@@ -305,11 +330,13 @@ curl http://localhost:3000/api/v1/chat_applications/invalid_token
 ### Chat Not Found
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/999
 ```
 
 **Response (404 Not Found):**
+
 ```json
 {
   "error": "Chat not found"
@@ -319,11 +346,13 @@ curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4
 ### Message Not Found
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages/999
 ```
 
 **Response (404 Not Found):**
+
 ```json
 {
   "error": "Message not found"
@@ -333,6 +362,7 @@ curl http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4
 ### Validation Error (Empty Name)
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications \
   -H "Content-Type: application/json" \
@@ -344,6 +374,7 @@ curl -X POST http://localhost:3000/api/v1/chat_applications \
 ```
 
 **Response (422 Unprocessable Entity):**
+
 ```json
 {
   "errors": {
@@ -355,6 +386,7 @@ curl -X POST http://localhost:3000/api/v1/chat_applications \
 ### Validation Error (Empty Message Body)
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
   -H "Content-Type: application/json" \
@@ -366,6 +398,7 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Response (422 Unprocessable Entity):**
+
 ```json
 {
   "errors": {
@@ -377,11 +410,13 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 ### Missing Search Query
 
 **Request:**
+
 ```bash
 curl "http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages/search"
 ```
 
 **Response (400 Bad Request):**
+
 ```json
 {
   "error": "Query parameter required"
@@ -497,11 +532,14 @@ http GET "localhost:3000/api/v1/chat_applications/TOKEN/chats/1/messages/search?
 ```javascript
 // Create chat application
 const createApp = async (name) => {
-  const response = await fetch('http://localhost:3000/api/v1/chat_applications', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_application: { name } })
-  });
+  const response = await fetch(
+    "http://localhost:3000/api/v1/chat_applications",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_application: { name } }),
+    }
+  );
   return response.json();
 };
 
@@ -510,18 +548,18 @@ const createMessage = async (token, chatNumber, body) => {
   const response = await fetch(
     `http://localhost:3000/api/v1/chat_applications/${token}/chats/${chatNumber}/messages`,
     {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: { body } })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: { body } }),
     }
   );
   return response.json();
 };
 
 // Usage
-const app = await createApp('My Chat App');
-const msg = await createMessage(app.token, 1, 'Hello world');
-console.log('Message created:', msg);
+const app = await createApp("My Chat App");
+const msg = await createMessage(app.token, 1, "Hello world");
+console.log("Message created:", msg);
 ```
 
 ### Python Requests

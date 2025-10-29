@@ -7,7 +7,6 @@ class Api::V1::ChatApplicationsController < ApplicationController
     @chat_application.token ||= SecureRandom.hex(16)
     if @chat_application.save
       render json: {
-        id: @chat_application.id,
         name: @chat_application.name,
         token: @chat_application.token,
         chats_count: @chat_application.chats_count
@@ -20,7 +19,6 @@ class Api::V1::ChatApplicationsController < ApplicationController
   # GET /api/v1/chat_applications/:token
   def show
     render json: {
-      id: @chat_application.id,
       name: @chat_application.name,
       token: @chat_application.token,
       chats_count: @chat_application.chats_count
@@ -32,7 +30,6 @@ class Api::V1::ChatApplicationsController < ApplicationController
     @chat_applications = ChatApplication.all
     render json: @chat_applications.map { |app|
       {
-        id: app.id,
         name: app.name,
         token: app.token,
         chats_count: app.chats_count
@@ -44,7 +41,6 @@ class Api::V1::ChatApplicationsController < ApplicationController
   def update
     if @chat_application.update(chat_application_params)
       render json: {
-        id: @chat_application.id,
         name: @chat_application.name,
         token: @chat_application.token,
         chats_count: @chat_application.chats_count
