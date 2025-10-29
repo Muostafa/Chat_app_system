@@ -51,11 +51,14 @@ class Api::V1::MessagesController < ApplicationController
     return render json: { error: 'Query parameter required' }, status: :bad_request if query.blank?
 
     begin
+      # Escape special wildcard characters and convert to lowercase for case-insensitive search
+      escaped_query = query.gsub(/([*?])/, '\\\\\1').downcase
+
       results = Message.search(
         query: {
           bool: {
             must: [
-              { match: { body: query } },
+              { wildcard: { "body.keyword": "*#{escaped_query}*" } },
               { term: { chat_id: @chat.id } }
             ]
           }

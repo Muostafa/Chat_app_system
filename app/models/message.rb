@@ -10,7 +10,9 @@ class Message < ApplicationRecord
   # Elasticsearch settings
   settings do
     mapping do
-      indexes :body, type: :text, analyzer: :standard
+      indexes :body, type: :text, analyzer: :standard do
+        indexes :keyword, type: :keyword
+      end
       indexes :chat_id, type: :integer
     end
   end
