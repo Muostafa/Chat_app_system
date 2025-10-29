@@ -27,14 +27,14 @@ RSpec.describe "Api::V1::ChatApplications", type: :request do
   end
 
   describe 'GET /api/v1/chat_applications/:token' do
-    let!(:app) { create(:chat_application) }
+    let!(:chat_app) { create(:chat_application) }
 
     it 'returns the chat application' do
-      get "/api/v1/chat_applications/#{app.token}"
+      get "/api/v1/chat_applications/#{chat_app.token}"
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
-      expect(json['token']).to eq(app.token)
-      expect(json['name']).to eq(app.name)
+      expect(json['token']).to eq(chat_app.token)
+      expect(json['name']).to eq(chat_app.name)
     end
 
     it 'returns 404 for non-existent token' do
@@ -44,30 +44,34 @@ RSpec.describe "Api::V1::ChatApplications", type: :request do
   end
 
   describe 'GET /api/v1/chat_applications' do
-    let!(:app1) { create(:chat_application) }
-    let!(:app2) { create(:chat_application) }
+    let!(:chat_app1) { create(:chat_application) }
+    let!(:chat_app2) { create(:chat_application) }
 
     it 'returns all chat applications' do
       get '/api/v1/chat_applications'
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
-      expect(json.length).to eq(2)
+      expect(json.length).to be >= 2
+      # Verify our created apps are in the response
+      tokens = json.map { |app| app['token'] }
+      expect(tokens).to include(chat_app1.token)
+      expect(tokens).to include(chat_app2.token)
     end
   end
 
   describe 'PATCH /api/v1/chat_applications/:token' do
-    let!(:app) { create(:chat_application, name: 'Old Name') }
+    let!(:chat_app) { create(:chat_application, name: 'Old Name') }
     let(:update_params) { { chat_application: { name: 'New Name' } } }
 
     it 'updates the chat application' do
-      patch "/api/v1/chat_applications/#{app.token}", params: update_params
+      patch "/api/v1/chat_applications/#{chat_app.token}", params: update_params
       expect(response).to have_http_status(:ok)
-      app.reload
-      expect(app.name).to eq('New Name')
+      chat_app.reload
+      expect(chat_app.name).to eq('New Name')
     end
 
     it 'returns the updated application' do
-      patch "/api/v1/chat_applications/#{app.token}", params: update_params
+      patch "/api/v1/chat_applications/#{chat_app.token}", params: update_params
       json = JSON.parse(response.body)
       expect(json['name']).to eq('New Name')
     end

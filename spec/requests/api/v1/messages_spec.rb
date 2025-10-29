@@ -1,16 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe "Api::V1::Messages", type: :request do
-  let!(:app) { create(:chat_application) }
-  let!(:chat) { create(:chat, chat_application: app, number: 1) }
-  let(:base_url) { "/api/v1/chat_applications/#{app.token}/chats/1/messages" }
+  let!(:chat_app) { create(:chat_application) }
+  let!(:chat) { create(:chat, chat_application: chat_app, number: 1) }
+  let(:base_url) { "/api/v1/chat_applications/#{chat_app.token}/chats/1/messages" }
   let(:valid_params) { { message: { body: 'Hello, World!' } } }
   let(:invalid_params) { { message: { body: '' } } }
 
   describe 'POST /api/v1/chat_applications/:token/chats/:number/messages' do
     it 'creates a new message with sequential number' do
       expect {
-        post base_url, params: valid_params
+        perform_enqueued_jobs do
+          post base_url, params: valid_params
+        end
       }.to change(Message, :count).by(1)
     end
 
@@ -23,9 +25,11 @@ RSpec.describe "Api::V1::Messages", type: :request do
     end
 
     it 'increments message numbers sequentially' do
-      post base_url, params: { message: { body: 'Message 1' } }
-      post base_url, params: { message: { body: 'Message 2' } }
-      post base_url, params: { message: { body: 'Message 3' } }
+      perform_enqueued_jobs do
+        post base_url, params: { message: { body: 'Message 1' } }
+        post base_url, params: { message: { body: 'Message 2' } }
+        post base_url, params: { message: { body: 'Message 3' } }
+      end
 
       messages = chat.messages.order(:created_at)
       expect(messages[0].number).to eq(1)
@@ -44,7 +48,7 @@ RSpec.describe "Api::V1::Messages", type: :request do
     end
 
     it 'returns 404 for non-existent chat' do
-      post "/api/v1/chat_applications/#{app.token}/chats/999/messages", params: valid_params
+      post "/api/v1/chat_applications/#{chat_app.token}/chats/999/messages", params: valid_params
       expect(response).to have_http_status(:not_found)
     end
   end
