@@ -51,7 +51,7 @@ services:
     build: .
     container_name: chat_system_web
     entrypoint: ["/bin/bash", "-c"]
-    command: ["bundle exec rails db:create && bundle exec rails db:migrate && bundle exec puma -b tcp://0.0.0.0:3000"]
+    command: ["bundle exec rails db:create && bundle exec rails db:migrate && bundle exec rails runner 'Message.__elasticsearch__.create_index! force: true rescue nil' && bundle exec puma -b tcp://0.0.0.0:3000"]
     ports:
       - "3000:3000"
     environment:
