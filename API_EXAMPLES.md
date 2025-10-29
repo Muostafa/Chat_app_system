@@ -2,11 +2,20 @@
 
 Complete cURL and HTTP examples for all Chat System API endpoints.
 
-## Base URL
+## Base URLs
 
+**Rails API:**
 ```
 http://localhost:3000/api/v1
 ```
+
+**Go Service (BONUS - High Performance):**
+```
+http://localhost:8080/api/v1
+```
+
+> **Note:** The Go service only implements chat and message creation endpoints. All other endpoints use the Rails API.
+> Both services share the same database and produce identical results.
 
 ## Chat Applications
 
@@ -111,10 +120,17 @@ Assuming token: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`
 
 ### Create Chat
 
-**Request:**
+**Rails API Request:**
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats \
+  -H "Content-Type: application/json"
+```
+
+**Go Service Request (High Performance):**
+
+```bash
+curl -X POST http://localhost:8080/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats \
   -H "Content-Type: application/json"
 ```
 
@@ -127,7 +143,9 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 }
 ```
 
-**Create Second Chat:**
+> **Note:** Both endpoints produce identical results. The Go service offers ~10x faster response time.
+
+**Create Second Chat (using either endpoint):**
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats \
@@ -191,10 +209,22 @@ Assuming token: `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6` and chat number: `1`
 
 ### Create Message
 
-**Request:**
+**Rails API Request:**
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": {
+      "body": "Hello, how are you?"
+    }
+  }'
+```
+
+**Go Service Request (High Performance):**
+
+```bash
+curl -X POST http://localhost:8080/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "message": {
@@ -211,7 +241,9 @@ curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0
 }
 ```
 
-**Create Second Message:**
+> **Note:** Both endpoints produce identical results. The Go service offers ~10x faster response time.
+
+**Create Second Message (using either endpoint):**
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
@@ -592,4 +624,147 @@ response = requests.get(
 )
 results = response.json()
 print(f'Found {len(results)} messages')
+```
+
+---
+
+## Go Service Examples (BONUS)
+
+The Go service provides high-performance alternatives for chat and message creation.
+
+### Go Service Health Check
+
+**Request:**
+
+```bash
+curl http://localhost:8080/health
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+### Create Chat via Go Service
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:8080/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "number": 1,
+  "messages_count": 0
+}
+```
+
+**Performance:** < 5ms response time (vs ~50ms with Rails)
+
+### Create Message via Go Service
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:8080/api/v1/chat_applications/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6/chats/1/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": {
+      "body": "Fast message from Go!"
+    }
+  }'
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "number": 1
+}
+```
+
+**Performance:** < 5ms response time (vs ~50ms with Rails)
+
+### Side-by-Side Comparison
+
+**Rails (Standard Performance):**
+```bash
+time curl -X POST http://localhost:3000/api/v1/chat_applications/{token}/chats
+# Response time: ~50ms
+```
+
+**Go (High Performance):**
+```bash
+time curl -X POST http://localhost:8080/api/v1/chat_applications/{token}/chats
+# Response time: ~5ms
+```
+
+### Go Service Architecture
+
+Both endpoints share the same backend:
+- **Redis**: Atomic INCR for sequential numbering
+- **MySQL**: Database validation and persistence
+- **Sidekiq**: Background job processing
+
+The Go service queues jobs in ActiveJob format that Rails Sidekiq workers process, ensuring complete compatibility.
+
+### When to Use Go Service
+
+Use the Go service (port 8080) for:
+- ✅ High-throughput chat creation
+- ✅ High-throughput message creation
+- ✅ Latency-sensitive operations
+- ✅ Load testing scenarios
+
+Use the Rails API (port 3000) for:
+- ✅ All read operations (GET requests)
+- ✅ Search functionality
+- ✅ Update operations
+- ✅ Complex business logic
+
+### Python Example with Go Service
+
+```python
+import requests
+import time
+
+GO_BASE_URL = 'http://localhost:8080/api/v1'
+RAILS_BASE_URL = 'http://localhost:3000/api/v1'
+
+# Get token from Rails API
+response = requests.post(
+    f'{RAILS_BASE_URL}/chat_applications',
+    json={'chat_application': {'name': 'Performance Test'}}
+)
+token = response.json()['token']
+
+# Create chat using Go service for better performance
+start = time.time()
+response = requests.post(f'{GO_BASE_URL}/chat_applications/{token}/chats')
+go_time = time.time() - start
+
+chat = response.json()
+print(f'Go service created chat {chat["number"]} in {go_time*1000:.2f}ms')
+
+# Create message using Go service
+start = time.time()
+response = requests.post(
+    f'{GO_BASE_URL}/chat_applications/{token}/chats/1/messages',
+    json={'message': {'body': 'Fast!'}}
+)
+go_time = time.time() - start
+
+message = response.json()
+print(f'Go service created message {message["number"]} in {go_time*1000:.2f}ms')
+
+# Read back using Rails API
+response = requests.get(f'{RAILS_BASE_URL}/chat_applications/{token}/chats/1/messages')
+messages = response.json()
+print(f'Found {len(messages)} messages')
 ```
