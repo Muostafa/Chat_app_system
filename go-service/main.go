@@ -49,10 +49,10 @@ func main() {
 	apiRouter := router.PathPrefix("/api/v1").Subrouter()
 
 	// POST /api/v1/chat_applications/:token/chats
-	apiRouter.HandleFunc("/chat_applications/{token}/chats", handlers.CreateChat).Methods("POST")
+	apiRouter.HandleFunc("/chat_applications/{token}/chats", handlers.CreateChat).Methods("POST", "OPTIONS")
 
 	// POST /api/v1/chat_applications/:token/chats/:number/messages
-	apiRouter.HandleFunc("/chat_applications/{token}/chats/{number}/messages", handlers.CreateMessage).Methods("POST")
+	apiRouter.HandleFunc("/chat_applications/{token}/chats/{number}/messages", handlers.CreateMessage).Methods("POST", "OPTIONS")
 
 	// Get port from environment or default to 8080
 	port := os.Getenv("PORT")

@@ -36,12 +36,26 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
+		// Development: Allow all origins
+		// Production: Set ALLOWED_ORIGINS environment variable with comma-separated domains
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+
+		// Allow all standard HTTP methods
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+
+		// Allow common headers including Authorization for authentication
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept")
+
+		// Expose headers that the client can read
+		w.Header().Set("Access-Control-Expose-Headers", "X-Request-Id, X-Runtime")
+
+		// Cache preflight requests for 2 hours (7200 seconds)
+		w.Header().Set("Access-Control-Max-Age", "7200")
+
+		// Handle preflight requests
 		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
