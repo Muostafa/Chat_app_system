@@ -30,7 +30,7 @@ gem "elasticsearch-rails", "~> 7.2"
 
 # Sidekiq for background jobs
 gem "sidekiq", "~> 7.0"
-gem "sidekiq-scheduler", "~> 5.0"
+gem "sidekiq-scheduler", "~> 6.0"
 
 # JSON serialization
 gem "jsonapi-serializer", "~> 2.2"
