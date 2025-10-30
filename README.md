@@ -11,26 +11,52 @@ A scalable, production-ready chat system API built with Ruby on Rails that handl
 # 1. Start everything
 docker-compose up
 
-# 2. Wait 30 seconds, then test
+# 2. Wait 30 seconds, then open your browser
+# Primary access: http://localhost (Web UI)
+
+# 3. Or test via API
 curl http://localhost:3000/api/v1/chat_applications
 
-# 3. Run tests (optional)
+# 4. Run tests (optional)
 docker-compose exec web bundle exec rspec
 # Expected: 69 examples, 0 failures
 ```
 
-**That's it!** The system is ready to use. See [How to Run the Code](#how-to-run-the-code) for detailed instructions.
+**That's it!** Open http://localhost to use the interactive web interface, or use the APIs directly. See [How to Run the Code](#how-to-run-the-code) for detailed instructions.
+
+## What's New - Frontend Addition
+
+This project now includes a production-ready web interface! Here's what's been added:
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Web UI** | React 18 + TypeScript | Interactive frontend interface |
+| **UI Framework** | shadcn/ui + Tailwind CSS | Modern, accessible components |
+| **State Management** | Zustand | Efficient global state |
+| **Performance Charts** | Recharts | Real-time service comparison |
+| **API Integration** | TanStack Query | Optimized data fetching |
+| **Web Server** | Nginx | Production-grade serving |
+| **Access Point** | http://localhost (port 80) | Primary user interface |
+
+**Key Features:**
+- Create and manage chat applications through a clean UI
+- Real-time message management with search
+- Toggle between Rails and Go services with live performance comparison
+- Responsive design that works on all devices
+- Full TypeScript type safety
 
 ## Stack
 
-- **Framework:** Ruby on Rails 8.1 (API only)
+- **Backend Framework:** Ruby on Rails 8.1 (API only)
+- **Frontend Framework:** React 18 + TypeScript + Vite
+- **UI Library:** shadcn/ui + Tailwind CSS
 - **Microservice:** Go 1.21 (Chat/Message creation endpoints - BONUS)
 - **Database:** MySQL 8.0
 - **Cache/Queue:** Redis 7
 - **Search Engine:** Elasticsearch 7.17
 - **Background Jobs:** Sidekiq 7.0
-- **Web Server:** Puma 6.0+
-- **Testing:** RSpec 6.0
+- **Web Server:** Puma 6.0+ (Backend), Nginx (Frontend)
+- **Testing:** RSpec 6.0 (Backend)
 - **Containerization:** Docker & Docker Compose
 
 ## Features
@@ -41,11 +67,14 @@ docker-compose exec web bundle exec rspec
 - ✅ Asynchronous message processing with Sidekiq
 - ✅ Automatic count tracking (chats_count, messages_count)
 - ✅ RESTful API with comprehensive error handling
+- ✅ **Modern Web UI:** Interactive React frontend with real-time updates
+- ✅ **Service Toggle:** Switch between Rails and Go backend services
+- ✅ **Performance Monitoring:** Real-time performance comparison charts
 - ✅ **BONUS:** Go microservice for high-performance chat/message creation
 - ✅ Polyglot architecture (Ruby + Go sharing infrastructure)
 - ✅ Database indices for optimized queries
 - ✅ Containerized infrastructure with docker-compose
-- ✅ Comprehensive RSpec test suite (62 examples, 0 failures)
+- ✅ Comprehensive RSpec test suite (69 examples, 0 failures)
 
 ## How to Run the Code
 
@@ -87,16 +116,19 @@ The system will automatically:
 - ✅ Start Elasticsearch 7.17 search engine
 - ✅ Build Rails application container
 - ✅ Build Go microservice container
+- ✅ Build React frontend container
 - ✅ Run database migrations
 - ✅ Create Elasticsearch indices
 - ✅ Start Rails API server (Puma) on port 3000
 - ✅ Start Go service on port 8080
+- ✅ Start React frontend (Nginx) on port 80
 - ✅ Start Sidekiq background worker
 
 **Watch the logs for this message:**
 ```
-chat_system_web | * Listening on http://0.0.0.0:3000
-chat_system_go  | Go Chat Service listening on port 8080
+chat_system_web      | * Listening on http://0.0.0.0:3000
+chat_system_go       | Go Chat Service listening on port 8080
+chat_system_frontend | Frontend ready on port 80
 ```
 
 #### 4. Verify Services are Running
@@ -110,6 +142,7 @@ docker-compose ps
 ```
 NAME                        STATUS
 chat_system_elasticsearch   Up (healthy)
+chat_system_frontend        Up (healthy)
 chat_system_go              Up
 chat_system_mysql           Up (healthy)
 chat_system_redis           Up (healthy)
@@ -117,16 +150,17 @@ chat_system_sidekiq         Up
 chat_system_web             Up
 ```
 
-**Test the APIs:**
+**Access the application:**
 ```bash
-# Test Rails API
-curl http://localhost:3000/api/v1/chat_applications
+# Web Interface (Recommended)
+Open browser: http://localhost
 
-# Test Go Service
-curl http://localhost:8080/health
+# Or test APIs directly
+curl http://localhost:3000/api/v1/chat_applications  # Rails API
+curl http://localhost:8080/health                    # Go Service
 ```
 
-Both should return successful responses.
+All should return successful responses.
 
 #### 5. Run Tests (Optional but Recommended)
 
@@ -146,6 +180,17 @@ bash test_requirements.sh
 ```
 
 ### Quick Demo
+
+**Using the Web Interface (Easiest):**
+1. Open http://localhost in your browser
+2. Create a new application by entering a name
+3. Click on the application to view its chats
+4. Create a new chat
+5. Add messages to the chat
+6. Try searching messages
+7. Toggle between Rails and Go services to compare performance
+
+**Using curl (API Testing):**
 
 ```bash
 # 1. Create a chat application
@@ -218,7 +263,8 @@ docker logs chat_system_elasticsearch
 **Problem: Port already in use**
 ```bash
 # Solution: Change ports in docker-compose.yml
-# For example, change "3000:3000" to "3001:3000"
+# Frontend: Change "80:80" to another port like "8000:80"
+# Backend: Change "3000:3000" to "3001:3000"
 # Then restart: docker-compose up
 ```
 
@@ -231,6 +277,7 @@ docker-compose logs -f
 # View specific service logs
 docker logs chat_system_web -f       # Rails API
 docker logs chat_system_go -f        # Go Service
+docker logs chat_system_frontend -f  # React Frontend
 docker logs chat_system_sidekiq -f   # Background Jobs
 docker logs chat_system_mysql -f     # Database
 ```
@@ -707,6 +754,7 @@ After running `docker-compose up`, these services will be available:
 
 | Service | URL | Description |
 |---------|-----|-------------|
+| **Web Interface** | http://localhost | Interactive React frontend (PRIMARY ACCESS POINT) |
 | **Rails API** | http://localhost:3000/api/v1 | Main REST API (full CRUD) |
 | **Go Service** | http://localhost:8080/api/v1 | High-performance API (create only) |
 | **MySQL** | localhost:3306 | Database (user: root, password: password) |
@@ -758,6 +806,22 @@ Chat_app_system/
 │   ├── models/                  # ActiveRecord models
 │   ├── jobs/                    # Background jobs
 │   └── services/                # Business logic services
+├── frontend/                    # React Web Interface
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── ApplicationManager.tsx
+│   │   │   ├── ChatManager.tsx
+│   │   │   ├── MessageManager.tsx
+│   │   │   ├── ServiceToggle.tsx
+│   │   │   ├── PerformanceChart.tsx
+│   │   │   └── ui/              # shadcn/ui components
+│   │   ├── lib/
+│   │   │   └── api.ts           # API client
+│   │   ├── store/               # Zustand state management
+│   │   └── pages/               # Route pages
+│   ├── Dockerfile               # Frontend container
+│   ├── nginx.conf               # Nginx configuration
+│   └── package.json             # Dependencies
 ├── go-service/                  # Go microservice (BONUS)
 │   ├── main.go                  # HTTP server
 │   ├── handlers/                # Request handlers
@@ -781,9 +845,43 @@ Chat_app_system/
 - **README.md** (this file) - Complete setup and API guide
 - **API_EXAMPLES.md** - Detailed API examples with curl commands
 - **go-service/README.md** - Go microservice documentation
+- **frontend/README.md** - Frontend documentation and features
+- **frontend/QUICKSTART.md** - Frontend quick start guide
 - **QUICK_START.md** - 3-step getting started guide
 - **SUBMISSION_CHECKLIST.md** - Requirements compliance checklist
 - **FINAL_SUBMISSION_SUMMARY.md** - Detailed project summary
+
+## Frontend Web Interface
+
+The project includes a modern, production-ready web interface built with React, TypeScript, and Vite.
+
+### Features
+
+- **Application Management:** Create and manage chat applications with a clean UI
+- **Chat Interface:** Real-time chat creation and message management
+- **Message Search:** Full-text search with Elasticsearch integration
+- **Service Toggle:** Switch between Rails and Go backend services on-the-fly
+- **Performance Monitoring:** Real-time performance comparison charts showing response times
+- **Responsive Design:** Mobile-friendly interface using shadcn/ui components
+- **State Management:** Zustand for efficient state management
+- **Type Safety:** Full TypeScript implementation
+
+### Technology Stack
+
+- **Framework:** React 18.3 + TypeScript 5.8
+- **Build Tool:** Vite 5.4
+- **UI Library:** shadcn/ui (Radix UI primitives)
+- **Styling:** Tailwind CSS 3.4
+- **State Management:** Zustand 5.0
+- **Data Fetching:** TanStack Query 5.0
+- **Charts:** Recharts 3.3
+- **Server:** Nginx (production build)
+
+### Access
+
+Open http://localhost in your browser after running `docker-compose up`
+
+For detailed frontend documentation, see [frontend/README.md](frontend/README.md)
 
 ## Key Features
 
@@ -870,7 +968,16 @@ This project was created for interview purposes.
 1. Ensure Docker is installed
 2. Run `docker-compose up`
 3. Wait 30 seconds
-4. Access APIs at http://localhost:3000 (Rails) or http://localhost:8080 (Go)
+4. **Open http://localhost in your browser** (recommended)
+   - Or access APIs at http://localhost:3000 (Rails) or http://localhost:8080 (Go)
 5. Run `docker-compose exec web bundle exec rspec` to verify (69 examples, 0 failures)
+
+**What you get:**
+- Modern React web interface on http://localhost
+- Rails REST API on http://localhost:3000
+- Go high-performance API on http://localhost:8080
+- Full chat application with message search
+- Performance monitoring and service comparison
+- Production-ready Docker setup
 
 **All requirements are met and tested.** The system is production-ready! 🚀
