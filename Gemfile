@@ -26,7 +26,7 @@ gem "redis", "~> 5.0"
 # Elasticsearch for full-text search
 gem "elasticsearch", "~> 7.17"
 gem "elasticsearch-model", "~> 7.2"
-gem "elasticsearch-rails", "~> 7.2"
+gem "elasticsearch-rails", "~> 8.0"
 
 # Sidekiq for background jobs
 gem "sidekiq", "~> 7.0"
