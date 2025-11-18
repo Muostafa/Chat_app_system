@@ -1,22 +1,17 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Health check endpoint for Docker/Kubernetes/load balancers
+  # Returns 200 if all services (MySQL, Redis, Elasticsearch) are healthy
+  get '/health', to: 'health#index'
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
-
-  # Redis counter consistency health check
-  namespace :health do
-    get 'redis_counters', to: 'health#redis_counters'
-  end
-
+  # API routes - versioned and nested resources
   namespace :api do
     namespace :v1 do
+      # Applications -> Chats -> Messages hierarchy
       resources :chat_applications, param: :token do
         resources :chats, param: :number do
           resources :messages, param: :number do
             collection do
-              get :search
+              get :search  # Elasticsearch full-text search
             end
           end
         end
