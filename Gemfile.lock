@@ -348,10 +348,9 @@ GEM
       logger
       rack (>= 2.2.4)
       redis-client (>= 0.22.2)
-    sidekiq-scheduler (5.0.6)
+    sidekiq-scheduler (6.0.1)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 6, < 8)
-      tilt (>= 1.4.0, < 3)
+      sidekiq (>= 7.3, < 9)
     solid_cable (3.0.12)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -381,7 +380,6 @@ GEM
     thruster (0.1.16-aarch64-linux)
     thruster (0.1.16-arm64-darwin)
     thruster (0.1.16-x86_64-linux)
-    tilt (2.6.1)
     timeout (0.4.3)
     tsort (0.2.0)
     tzinfo (2.0.6)
@@ -430,7 +428,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   shoulda-matchers (~> 5.0)
   sidekiq (~> 7.0)
-  sidekiq-scheduler (~> 5.0)
+  sidekiq-scheduler (~> 6.0)
   solid_cable
   solid_cache
   solid_queue
